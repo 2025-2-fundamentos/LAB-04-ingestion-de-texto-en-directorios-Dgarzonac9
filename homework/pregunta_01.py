@@ -4,6 +4,8 @@
 """
 Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
+import pandas as pd
+from pathlib import Path
 
 
 def pregunta_01():
@@ -71,3 +73,35 @@ def pregunta_01():
 
 
     """
+    data_train = {"phrase" : [], "target" : []}
+    data_test = {"phrase" : [], "target" : []}
+
+    base_path = Path("files/input")
+
+    for dataset_type in ["train", "test"]:
+        for sentiment in ["negative", "neutral", "positive"]:
+
+            file_path = base_path / dataset_type / sentiment
+            
+            for txt_file in file_path.glob("*.txt"):
+                df = pd.read_csv(txt_file, header=None, names=["text"])
+
+                phrase = df["text"].iloc[0]
+
+                if dataset_type == "train":
+                    data_train["phrase"].append(phrase)
+                    data_train["target"].append(sentiment)
+                else:
+                    data_test["phrase"].append(phrase)
+                    data_test["target"].append(sentiment)
+
+    df_train = pd.DataFrame(data_train)
+    df_test = pd.DataFrame(data_test)
+
+    output_path =   Path("files/output")
+    df_train.to_csv(output_path / "train_dataset.csv", index=False)
+    df_test.to_csv(output_path / "test_dataset.csv", index=False)                
+
+
+if __name__ == "__main__":
+    pregunta_01()
